@@ -130,7 +130,7 @@ class Pooling(nn.Module):
         super(Pooling, self).__init__()
 
         self.config_keys = [
-            "hidden_states_dim",
+            # "hidden_states_dim",
             "pooling_mode_cls_token",
             "pooling_mode_mean_tokens",
             "pooling_mode_max_tokens",

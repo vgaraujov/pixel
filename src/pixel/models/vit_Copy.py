@@ -229,25 +229,16 @@ class ViTEmbeddings(nn.Module):
     def __init__(self, config, use_mask_token=False):
         super().__init__()
 
-        self.cls_txt_token = nn.Parameter(torch.zeros(1, 1, config.hidden_size))
-        self.cls_img_token = nn.Parameter(torch.zeros(1, 1, config.hidden_size))
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, config.hidden_size))
         self.mask_token = nn.Parameter(torch.zeros(1, 1, config.hidden_size)) if use_mask_token else None
-        self.patch_txt_embeddings = PatchEmbeddings(
-            image_size=config.txt_size,
+        self.patch_embeddings = PatchEmbeddings(
+            image_size=config.image_size,
             patch_size=config.patch_size,
             num_channels=config.num_channels,
             embed_dim=config.hidden_size,
         )
-        self.patch_img_embeddings = PatchEmbeddings(
-            image_size=config.img_size,
-            patch_size=config.patch_size,
-            num_channels=config.num_channels,
-            embed_dim=config.hidden_size,
-        )
-        self.num_txt_patches = self.patch_txt_embeddings.num_patches
-        self.num_img_patches = self.patch_img_embeddings.num_patches
-        self.position_txt_embeddings = nn.Parameter(torch.zeros(1, self.num_txt_patches + 1, config.hidden_size))
-        self.position_img_embeddings = nn.Parameter(torch.zeros(1, self.num_img_patches + 1, config.hidden_size))
+        self.num_patches = self.patch_embeddings.num_patches
+        self.position_embeddings = nn.Parameter(torch.zeros(1, self.num_patches + 1, config.hidden_size))
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.config = config
 
@@ -281,38 +272,28 @@ class ViTEmbeddings(nn.Module):
         patch_pos_embed = patch_pos_embed.permute(0, 2, 3, 1).view(1, -1, dim)
         return torch.cat((class_pos_embed.unsqueeze(0), patch_pos_embed), dim=1)
 
-    def forward(self, pixel_txt_values, pixel_img_values, attention_txt_mask=None, attention_img_mask=None, bool_masked_pos=None, interpolate_pos_encoding=False):
-        batch_size, num_channels, _, _ = pixel_txt_values.shape
-        txt_embeddings = self.patch_txt_embeddings(pixel_txt_values, interpolate_pos_encoding=interpolate_pos_encoding)
-        img_embeddings = self.patch_img_embeddings(pixel_img_values, interpolate_pos_encoding=interpolate_pos_encoding)
+    def forward(self, pixel_values, attention_mask=None, bool_masked_pos=None, interpolate_pos_encoding=False):
+        batch_size, num_channels, height, width = pixel_values.shape
+        embeddings = self.patch_embeddings(pixel_values, interpolate_pos_encoding=interpolate_pos_encoding)
 
-        # batch_size, seq_len, _ = embeddings.size()
-        # if bool_masked_pos is not None:
-        #     mask_tokens = self.mask_token.expand(batch_size, seq_len, -1)
-        #     # replace the masked visual tokens by mask_tokens
-        #     mask = bool_masked_pos.unsqueeze(-1).type_as(mask_tokens)
-        #     embeddings = embeddings * (1.0 - mask) + mask_tokens * mask
+        batch_size, seq_len, _ = embeddings.size()
+        if bool_masked_pos is not None:
+            mask_tokens = self.mask_token.expand(batch_size, seq_len, -1)
+            # replace the masked visual tokens by mask_tokens
+            mask = bool_masked_pos.unsqueeze(-1).type_as(mask_tokens)
+            embeddings = embeddings * (1.0 - mask) + mask_tokens * mask
 
         # add the [CLS] token to the embedded patch tokens
-        cls_txt_tokens = self.cls_txt_token.expand(batch_size, -1, -1)
-        cls_img_tokens = self.cls_img_token.expand(batch_size, -1, -1)
-
-        txt_embeddings = torch.cat((cls_txt_tokens, txt_embeddings), dim=1)
-        img_embeddings = torch.cat((cls_img_tokens, img_embeddings), dim=1)
-        attention_mask = torch.cat((torch.ones((batch_size, 1), device=attention_txt_mask.device), attention_txt_mask, 
-                                    torch.ones((batch_size, 1), device=attention_img_mask.device), attention_img_mask), dim=1)
+        cls_tokens = self.cls_token.expand(batch_size, -1, -1)
+        embeddings = torch.cat((cls_tokens, embeddings), dim=1)
+        attention_mask = torch.cat((torch.ones((batch_size, 1), device=attention_mask.device), attention_mask), dim=1)
 
         # add positional encoding to each token
         if interpolate_pos_encoding:
-            _, _, height, width = pixel_txt_values.shape
-            txt_embeddings = txt_embeddings + self.interpolate_pos_encoding(txt_embeddings, height, width)
-            _, _, height, width = pixel_img_values.shape
-            img_embeddings = img_embeddings + self.interpolate_pos_encoding(img_embeddings, height, width)
+            embeddings = embeddings + self.interpolate_pos_encoding(embeddings, height, width)
         else:
-            txt_embeddings = txt_embeddings + self.position_txt_embeddings
-            img_embeddings = img_embeddings + self.position_img_embeddings
+            embeddings = embeddings + self.position_embeddings
 
-        embeddings = torch.cat((txt_embeddings, img_embeddings), 1)
         embeddings = self.dropout(embeddings)
 
         return embeddings, attention_mask
@@ -345,10 +326,8 @@ class ViTModel(ViTPreTrainedModel):
 
     def forward(
         self,
-        pixel_txt_values=None,
-        pixel_img_values=None,
-        attention_txt_mask=None,
-        attention_img_mask=None,
+        pixel_values=None,
+        attention_mask=None,
         bool_masked_pos=None,
         head_mask=None,
         output_attentions=None,
@@ -362,7 +341,7 @@ class ViTModel(ViTPreTrainedModel):
         )
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
-        if pixel_txt_values is None and pixel_img_values is None:
+        if pixel_values is None:
             raise ValueError("You have to specify pixel_values")
 
         # Prepare head mask if needed
@@ -372,15 +351,12 @@ class ViTModel(ViTPreTrainedModel):
         # and head_mask is converted to shape [num_hidden_layers x batch x num_heads x seq_length x seq_length]
         head_mask = self.get_head_mask(head_mask, self.config.num_hidden_layers)
 
-        if attention_txt_mask is None and attention_img_mask is None:
-            attention_txt_mask = torch.ones((pixel_txt_values.shape[0], self.embeddings.num_txt_patches), device=self.device)
-            attention_img_mask = torch.ones((pixel_img_values.shape[0], self.embeddings.num_img_patches), device=self.device)
+        if attention_mask is None:
+            attention_mask = torch.ones((pixel_values.shape[0], self.embeddings.num_patches), device=self.device)
 
         embedding_output, attention_mask = self.embeddings(
-            pixel_txt_values,
-            pixel_img_values,
-            attention_txt_mask=attention_txt_mask,
-            attention_img_mask=attention_img_mask,
+            pixel_values,
+            attention_mask=attention_mask,
             bool_masked_pos=bool_masked_pos,
             interpolate_pos_encoding=interpolate_pos_encoding,
         )
