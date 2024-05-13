@@ -51,7 +51,7 @@ conda activate pixel-env
 
 3. Install Python packages
 ```bash
-conda install pytorch torchvision cudatoolkit=11.3 -c pytorch
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 conda install -c conda-forge pycairo pygobject manimpango
 pip install --upgrade pip
 pip install -r requirements.txt
