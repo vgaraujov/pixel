@@ -1,0 +1,194 @@
+Wed May 22 15:47:35 2024       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.54.14              Driver Version: 550.54.14      CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:01:00.0 Off |                    0 |
+| N/A   27C    P0             51W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A100-SXM4-40GB          On  |   00000000:41:00.0 Off |                    0 |
+| N/A   28C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A100-SXM4-40GB          On  |   00000000:81:00.0 Off |                    0 |
+| N/A   27C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A100-SXM4-40GB          On  |   00000000:C1:00.0 Off |                    0 |
+| N/A   26C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+The following values were not passed to `accelerate launch` and had defaults used instead:
+	`--num_processes` was set to a value of `4`
+		More than one GPU was found, enabling multi-GPU training.
+		If this was unintended please pass in `--num_processes=1`.
+	`--num_machines` was set to a value of `1`
+	`--mixed_precision` was set to a value of `'no'`
+	`--dynamo_backend` was set to a value of `'no'`
+To avoid this warning pass in values for each of the problematic parameters or run `accelerate config`.
+Defining Configs and Processor ......
+
+Downloading:   0%|          | 0.00/132k [00:00<?, ?B/s]Downloading:  25%|██▍       | 33.0k/132k [00:00<00:00, 179kB/s]Downloading:  74%|███████▍  | 98.0k/132k [00:00<00:00, 280kB/s]Downloading: 100%|██████████| 132k/132k [00:00<00:00, 356kB/s] 
+Downloading:   0%|          | 0.00/251 [00:00<?, ?B/s]Downloading: 100%|██████████| 251/251 [00:00<00:00, 2.41MB/s]
+Downloading:   0%|          | 0.00/320 [00:00<?, ?B/s]Downloading: 100%|██████████| 320/320 [00:00<00:00, 4.27MB/s]
+Downloading:   0%|          | 0.00/226k [00:00<?, ?B/s]Downloading:  10%|▉         | 22.0k/226k [00:00<00:01, 118kB/s]Downloading:  43%|████▎     | 97.0k/226k [00:00<00:00, 286kB/s]Downloading: 100%|██████████| 226k/226k [00:00<00:00, 588kB/s] 
+Downloading:   0%|          | 0.00/455k [00:00<?, ?B/s]Downloading:   7%|▋         | 33.0k/455k [00:00<00:02, 176kB/s]Downloading:  21%|██▏       | 97.0k/455k [00:00<00:01, 274kB/s]Downloading:  53%|█████▎    | 241k/455k [00:00<00:00, 499kB/s] Downloading: 100%|██████████| 455k/455k [00:00<00:00, 802kB/s]
+Downloading:   0%|          | 0.00/112 [00:00<?, ?B/s]Downloading: 100%|██████████| 112/112 [00:00<00:00, 1.32MB/s]
+
+ Loading training data ...... 
+
+
+ Number of train questions: 443757
+
+ Number of train annotations: 443757
+
+ Loading evaluation data..... 
+
+
+ Number of val questions: 214354
+
+ Number of val annotations: 214354
+Downloading:   0%|          | 0.00/653 [00:00<?, ?B/s]Downloading: 100%|██████████| 653/653 [00:00<00:00, 6.09MB/s]
+Downloading:   0%|          | 0.00/518M [00:00<?, ?B/s]Downloading:   1%|          | 6.45M/518M [00:00<00:07, 67.7MB/s]Downloading:   3%|▎         | 16.9M/518M [00:00<00:05, 92.5MB/s]Downloading:   5%|▌         | 28.0M/518M [00:00<00:04, 103MB/s] Downloading:   8%|▊         | 39.1M/518M [00:00<00:04, 108MB/s]Downloading:  10%|▉         | 50.2M/518M [00:00<00:04, 111MB/s]Downloading:  12%|█▏        | 61.3M/518M [00:00<00:04, 113MB/s]Downloading:  14%|█▍        | 72.3M/518M [00:00<00:04, 114MB/s]Downloading:  16%|█▌        | 83.4M/518M [00:00<00:03, 115MB/s]Downloading:  18%|█▊        | 94.4M/518M [00:00<00:03, 115MB/s]Downloading:  20%|██        | 105M/518M [00:01<00:03, 115MB/s] Downloading:  22%|██▏       | 116M/518M [00:01<00:03, 115MB/s]Downloading:  25%|██▍       | 127M/518M [00:01<00:03, 115MB/s]Downloading:  27%|██▋       | 138M/518M [00:01<00:03, 115MB/s]Downloading:  29%|██▉       | 149M/518M [00:01<00:03, 115MB/s]Downloading:  31%|███       | 160M/518M [00:01<00:03, 114MB/s]Downloading:  33%|███▎      | 171M/518M [00:01<00:03, 114MB/s]Downloading:  35%|███▌      | 182M/518M [00:01<00:03, 115MB/s]Downloading:  37%|███▋      | 193M/518M [00:01<00:02, 115MB/s]Downloading:  39%|███▉      | 204M/518M [00:01<00:02, 115MB/s]Downloading:  42%|████▏     | 215M/518M [00:02<00:02, 115MB/s]Downloading:  44%|████▎     | 226M/518M [00:02<00:02, 115MB/s]Downloading:  46%|████▌     | 237M/518M [00:02<00:02, 116MB/s]Downloading:  48%|████▊     | 248M/518M [00:02<00:02, 116MB/s]Downloading:  50%|█████     | 259M/518M [00:02<00:02, 116MB/s]Downloading:  52%|█████▏    | 270M/518M [00:02<00:02, 115MB/s]Downloading:  54%|█████▍    | 281M/518M [00:02<00:02, 115MB/s]Downloading:  56%|█████▋    | 292M/518M [00:02<00:02, 115MB/s]Downloading:  59%|█████▊    | 303M/518M [00:02<00:01, 115MB/s]Downloading:  61%|██████    | 314M/518M [00:02<00:01, 115MB/s]Downloading:  63%|██████▎   | 325M/518M [00:03<00:01, 115MB/s]Downloading:  65%|██████▍   | 336M/518M [00:03<00:01, 115MB/s]Downloading:  67%|██████▋   | 347M/518M [00:03<00:01, 115MB/s]Downloading:  69%|██████▉   | 358M/518M [00:03<00:01, 115MB/s]Downloading:  71%|███████▏  | 369M/518M [00:03<00:01, 115MB/s]Downloading:  73%|███████▎  | 380M/518M [00:03<00:01, 115MB/s]Downloading:  76%|███████▌  | 391M/518M [00:03<00:01, 115MB/s]Downloading:  78%|███████▊  | 402M/518M [00:03<00:01, 115MB/s]Downloading:  80%|███████▉  | 413M/518M [00:03<00:00, 115MB/s]Downloading:  82%|████████▏ | 424M/518M [00:03<00:00, 115MB/s]Downloading:  84%|████████▍ | 435M/518M [00:04<00:00, 115MB/s]Downloading:  86%|████████▌ | 446M/518M [00:04<00:00, 114MB/s]Downloading:  88%|████████▊ | 457M/518M [00:04<00:00, 113MB/s]Downloading:  90%|█████████ | 468M/518M [00:04<00:00, 112MB/s]Downloading:  92%|█████████▏| 478M/518M [00:04<00:00, 112MB/s]Downloading:  94%|█████████▍| 489M/518M [00:04<00:00, 112MB/s]Downloading:  97%|█████████▋| 500M/518M [00:04<00:00, 111MB/s]Downloading:  99%|█████████▊| 511M/518M [00:04<00:00, 112MB/s]Downloading: 100%|██████████| 518M/518M [00:04<00:00, 113MB/s]
+Some weights of the model checkpoint at dandelin/vilt-b32-mlm were not used when initializing ViltForQuestionAnswering: ['mlm_score.transform.dense.weight', 'mlm_score.transform.dense.bias', 'mlm_score.transform.LayerNorm.bias', 'mlm_score.bias', 'mlm_score.decoder.weight', 'mlm_score.transform.LayerNorm.weight']
+- This IS expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of ViltForQuestionAnswering were not initialized from the model checkpoint at dandelin/vilt-b32-mlm and are newly initialized: ['classifier.3.weight', 'classifier.0.bias', 'classifier.3.bias', 'classifier.1.weight', 'classifier.0.weight', 'classifier.1.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Some weights of the model checkpoint at dandelin/vilt-b32-mlm were not used when initializing ViltForQuestionAnswering: ['mlm_score.transform.dense.weight', 'mlm_score.transform.LayerNorm.bias', 'mlm_score.decoder.weight', 'mlm_score.transform.dense.bias', 'mlm_score.bias', 'mlm_score.transform.LayerNorm.weight']
+- This IS expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of ViltForQuestionAnswering were not initialized from the model checkpoint at dandelin/vilt-b32-mlm and are newly initialized: ['classifier.1.bias', 'classifier.3.bias', 'classifier.0.bias', 'classifier.0.weight', 'classifier.3.weight', 'classifier.1.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Some weights of the model checkpoint at dandelin/vilt-b32-mlm were not used when initializing ViltForQuestionAnswering: ['mlm_score.transform.dense.weight', 'mlm_score.bias', 'mlm_score.transform.LayerNorm.bias', 'mlm_score.transform.LayerNorm.weight', 'mlm_score.transform.dense.bias', 'mlm_score.decoder.weight']
+- This IS expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of ViltForQuestionAnswering were not initialized from the model checkpoint at dandelin/vilt-b32-mlm and are newly initialized: ['classifier.0.bias', 'classifier.3.bias', 'classifier.1.weight', 'classifier.3.weight', 'classifier.0.weight', 'classifier.1.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+
+ Loading Model....... 
+
+Some weights of the model checkpoint at dandelin/vilt-b32-mlm were not used when initializing ViltForQuestionAnswering: ['mlm_score.transform.LayerNorm.weight', 'mlm_score.transform.dense.weight', 'mlm_score.bias', 'mlm_score.transform.LayerNorm.bias', 'mlm_score.transform.dense.bias', 'mlm_score.decoder.weight']
+- This IS expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing ViltForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of ViltForQuestionAnswering were not initialized from the model checkpoint at dandelin/vilt-b32-mlm and are newly initialized: ['classifier.0.weight', 'classifier.1.weight', 'classifier.0.bias', 'classifier.3.weight', 'classifier.1.bias', 'classifier.3.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Loading Dataloaders ..... 
+
+
+ Training Started ...... 
+
+
+ Epoch: 1
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:31<57:41,  2.12s/it] 12%|█▏        | 200/1734 [06:59<53:36,  2.10s/it] 17%|█▋        | 300/1734 [10:26<49:49,  2.08s/it] 23%|██▎       | 400/1734 [13:53<46:09,  2.08s/it] 29%|██▉       | 500/1734 [17:18<42:31,  2.07s/it] 35%|███▍      | 600/1734 [20:43<38:58,  2.06s/it] 40%|████      | 700/1734 [24:08<35:27,  2.06s/it] 46%|████▌     | 800/1734 [27:33<31:58,  2.05s/it] 52%|█████▏    | 900/1734 [30:56<28:28,  2.05s/it] 58%|█████▊    | 1000/1734 [34:19<24:58,  2.04s/it] 63%|██████▎   | 1100/1734 [37:42<21:32,  2.04s/it] 69%|██████▉   | 1200/1734 [41:04<18:05,  2.03s/it] 75%|███████▍  | 1300/1734 [44:27<14:41,  2.03s/it] 81%|████████  | 1400/1734 [47:49<11:17,  2.03s/it] 87%|████████▋ | 1500/1734 [51:12<07:54,  2.03s/it] 92%|█████████▏| 1600/1734 [54:36<04:32,  2.03s/it] 98%|█████████▊| 1700/1734 [58:03<01:09,  2.05s/it]100%|██████████| 1734/1734 [59:14<00:00,  2.05s/it]
+
+ Epoch: 2
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:27<56:24,  2.07s/it] 12%|█▏        | 200/1734 [06:54<53:00,  2.07s/it] 17%|█▋        | 300/1734 [10:21<49:28,  2.07s/it] 23%|██▎       | 400/1734 [13:47<45:56,  2.07s/it] 29%|██▉       | 500/1734 [17:14<42:32,  2.07s/it] 35%|███▍      | 600/1734 [20:43<39:13,  2.08s/it] 40%|████      | 700/1734 [24:09<35:40,  2.07s/it] 46%|████▌     | 800/1734 [27:37<32:17,  2.07s/it] 52%|█████▏    | 900/1734 [31:05<28:51,  2.08s/it] 58%|█████▊    | 1000/1734 [34:33<25:24,  2.08s/it] 63%|██████▎   | 1100/1734 [38:03<22:00,  2.08s/it] 69%|██████▉   | 1200/1734 [41:30<18:30,  2.08s/it] 75%|███████▍  | 1300/1734 [44:58<15:03,  2.08s/it] 81%|████████  | 1400/1734 [48:24<11:32,  2.07s/it] 87%|████████▋ | 1500/1734 [51:53<08:06,  2.08s/it] 92%|█████████▏| 1600/1734 [55:17<04:37,  2.07s/it] 98%|█████████▊| 1700/1734 [58:43<01:10,  2.06s/it]100%|██████████| 1734/1734 [59:52<00:00,  2.07s/it]
+
+ Evaluation -------------------------------- 
+
+  0%|          | 0/838 [00:00<?, ?it/s] 12%|█▏        | 100/838 [03:06<22:59,  1.87s/it] 24%|██▍       | 200/838 [06:07<19:29,  1.83s/it] 36%|███▌      | 300/838 [09:16<16:40,  1.86s/it] 48%|████▊     | 400/838 [12:08<13:10,  1.80s/it] 60%|█████▉    | 500/838 [14:57<09:55,  1.76s/it] 72%|███████▏  | 600/838 [17:47<06:54,  1.74s/it] 84%|████████▎ | 700/838 [20:39<03:59,  1.73s/it] 95%|█████████▌| 800/838 [23:35<01:06,  1.74s/it]100%|██████████| 838/838 [24:40<00:00,  1.77s/it]
+
+ Evaluation in Epoch 2: {'f1': 0.374758354949185, 'roc_auc': 0.6268059714940405, 'accuracy': 0.1739039159521166}
+
+ --------------------------------------------
+
+ Epoch: 3
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:26<56:20,  2.07s/it] 12%|█▏        | 200/1734 [06:53<52:50,  2.07s/it] 17%|█▋        | 300/1734 [10:19<49:21,  2.07s/it] 23%|██▎       | 400/1734 [13:45<45:52,  2.06s/it] 29%|██▉       | 500/1734 [17:11<42:24,  2.06s/it] 35%|███▍      | 600/1734 [20:37<38:56,  2.06s/it] 40%|████      | 700/1734 [24:03<35:29,  2.06s/it] 46%|████▌     | 800/1734 [27:29<32:03,  2.06s/it] 52%|█████▏    | 900/1734 [30:55<28:37,  2.06s/it] 58%|█████▊    | 1000/1734 [34:21<25:11,  2.06s/it] 63%|██████▎   | 1100/1734 [37:47<21:46,  2.06s/it] 69%|██████▉   | 1200/1734 [41:14<18:21,  2.06s/it] 75%|███████▍  | 1300/1734 [44:40<14:54,  2.06s/it] 81%|████████  | 1400/1734 [48:06<11:28,  2.06s/it] 87%|████████▋ | 1500/1734 [51:32<08:02,  2.06s/it] 92%|█████████▏| 1600/1734 [54:59<04:36,  2.06s/it] 98%|█████████▊| 1700/1734 [58:25<01:10,  2.06s/it]100%|██████████| 1734/1734 [59:34<00:00,  2.06s/it]
+
+ Epoch: 4
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:26<56:20,  2.07s/it] 12%|█▏        | 200/1734 [06:52<52:39,  2.06s/it] 17%|█▋        | 300/1734 [10:18<49:14,  2.06s/it] 23%|██▎       | 400/1734 [13:44<45:48,  2.06s/it] 29%|██▉       | 500/1734 [17:10<42:22,  2.06s/it] 35%|███▍      | 600/1734 [20:36<38:56,  2.06s/it] 40%|████      | 700/1734 [24:02<35:30,  2.06s/it] 46%|████▌     | 800/1734 [27:28<32:02,  2.06s/it] 52%|█████▏    | 900/1734 [30:54<28:39,  2.06s/it] 58%|█████▊    | 1000/1734 [34:20<25:12,  2.06s/it] 63%|██████▎   | 1100/1734 [37:47<21:47,  2.06s/it] 69%|██████▉   | 1200/1734 [41:12<18:19,  2.06s/it] 75%|███████▍  | 1300/1734 [44:38<14:54,  2.06s/it] 81%|████████  | 1400/1734 [48:05<11:28,  2.06s/it] 87%|████████▋ | 1500/1734 [51:31<08:02,  2.06s/it] 92%|█████████▏| 1600/1734 [54:57<04:36,  2.06s/it] 98%|█████████▊| 1700/1734 [58:23<01:10,  2.06s/it]100%|██████████| 1734/1734 [59:32<00:00,  2.06s/it]
+
+ Evaluation -------------------------------- 
+
+  0%|          | 0/838 [00:00<?, ?it/s] 12%|█▏        | 100/838 [02:40<19:43,  1.60s/it] 24%|██▍       | 200/838 [05:21<17:04,  1.61s/it] 36%|███▌      | 300/838 [08:01<14:22,  1.60s/it] 48%|████▊     | 400/838 [10:40<11:41,  1.60s/it] 60%|█████▉    | 500/838 [13:21<09:01,  1.60s/it] 72%|███████▏  | 600/838 [16:03<06:22,  1.61s/it] 84%|████████▎ | 700/838 [18:44<03:42,  1.61s/it] 95%|█████████▌| 800/838 [21:25<01:01,  1.61s/it]100%|██████████| 838/838 [22:25<00:00,  1.61s/it]
+
+ Evaluation in Epoch 4: {'f1': 0.46512803854517876, 'roc_auc': 0.6608796966966595, 'accuracy': 0.316299205986359}
+
+ --------------------------------------------
+
+ Epoch: 5
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:26<56:15,  2.07s/it] 12%|█▏        | 200/1734 [06:53<52:55,  2.07s/it] 17%|█▋        | 300/1734 [10:21<49:33,  2.07s/it] 23%|██▎       | 400/1734 [13:48<46:03,  2.07s/it] 29%|██▉       | 500/1734 [17:16<42:39,  2.07s/it] 35%|███▍      | 600/1734 [20:44<39:13,  2.08s/it] 40%|████      | 700/1734 [24:12<35:47,  2.08s/it] 46%|████▌     | 800/1734 [27:39<32:18,  2.08s/it] 52%|█████▏    | 900/1734 [31:06<28:50,  2.08s/it] 58%|█████▊    | 1000/1734 [34:33<25:21,  2.07s/it] 63%|██████▎   | 1100/1734 [38:00<21:53,  2.07s/it] 69%|██████▉   | 1200/1734 [41:28<18:26,  2.07s/it] 75%|███████▍  | 1300/1734 [44:56<15:00,  2.08s/it] 81%|████████  | 1400/1734 [48:23<11:32,  2.07s/it] 87%|████████▋ | 1500/1734 [51:51<08:05,  2.07s/it] 92%|█████████▏| 1600/1734 [55:18<04:38,  2.07s/it] 98%|█████████▊| 1700/1734 [58:46<01:10,  2.08s/it]100%|██████████| 1734/1734 [59:55<00:00,  2.07s/it]
+
+ Epoch: 6
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:28<56:50,  2.09s/it] 12%|█▏        | 200/1734 [06:55<53:06,  2.08s/it] 17%|█▋        | 300/1734 [10:22<49:30,  2.07s/it] 23%|██▎       | 400/1734 [13:48<45:59,  2.07s/it] 29%|██▉       | 500/1734 [17:14<42:30,  2.07s/it] 35%|███▍      | 600/1734 [20:41<39:03,  2.07s/it] 40%|████      | 700/1734 [24:07<35:35,  2.07s/it] 46%|████▌     | 800/1734 [27:34<32:09,  2.07s/it] 52%|█████▏    | 900/1734 [31:01<28:43,  2.07s/it] 58%|█████▊    | 1000/1734 [34:28<25:17,  2.07s/it] 63%|██████▎   | 1100/1734 [37:54<21:50,  2.07s/it] 69%|██████▉   | 1200/1734 [41:21<18:24,  2.07s/it] 75%|███████▍  | 1300/1734 [44:48<14:57,  2.07s/it] 81%|████████  | 1400/1734 [48:15<11:31,  2.07s/it] 87%|████████▋ | 1500/1734 [51:43<08:04,  2.07s/it] 92%|█████████▏| 1600/1734 [55:09<04:37,  2.07s/it] 98%|█████████▊| 1700/1734 [58:37<01:10,  2.07s/it]100%|██████████| 1734/1734 [59:46<00:00,  2.07s/it]
+
+ Evaluation -------------------------------- 
+
+  0%|          | 0/838 [00:00<?, ?it/s] 12%|█▏        | 100/838 [02:42<20:02,  1.63s/it] 24%|██▍       | 200/838 [05:25<17:17,  1.63s/it] 36%|███▌      | 300/838 [08:10<14:42,  1.64s/it] 48%|████▊     | 400/838 [10:52<11:54,  1.63s/it] 60%|█████▉    | 500/838 [13:34<09:09,  1.63s/it] 72%|███████▏  | 600/838 [16:16<06:26,  1.62s/it] 84%|████████▎ | 700/838 [19:00<03:44,  1.63s/it] 95%|█████████▌| 800/838 [21:42<01:01,  1.63s/it]100%|██████████| 838/838 [22:43<00:00,  1.63s/it]
+
+ Evaluation in Epoch 6: {'f1': 0.5206359504846333, 'roc_auc': 0.6900885560991167, 'accuracy': 0.34770053276355933}
+
+ --------------------------------------------
+
+ Epoch: 7
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:28<56:42,  2.08s/it] 12%|█▏        | 200/1734 [06:55<53:03,  2.08s/it] 17%|█▋        | 300/1734 [10:22<49:33,  2.07s/it] 23%|██▎       | 400/1734 [13:49<46:03,  2.07s/it] 29%|██▉       | 500/1734 [17:16<42:34,  2.07s/it] 35%|███▍      | 600/1734 [20:43<39:07,  2.07s/it] 40%|████      | 700/1734 [24:09<35:39,  2.07s/it] 46%|████▌     | 800/1734 [27:37<32:14,  2.07s/it] 52%|█████▏    | 900/1734 [31:04<28:47,  2.07s/it] 58%|█████▊    | 1000/1734 [34:31<25:20,  2.07s/it] 63%|██████▎   | 1100/1734 [37:58<21:53,  2.07s/it] 69%|██████▉   | 1200/1734 [41:26<18:26,  2.07s/it] 75%|███████▍  | 1300/1734 [44:53<14:59,  2.07s/it] 81%|████████  | 1400/1734 [48:21<11:32,  2.07s/it] 87%|████████▋ | 1500/1734 [51:48<08:05,  2.07s/it] 92%|█████████▏| 1600/1734 [55:16<04:38,  2.07s/it] 98%|█████████▊| 1700/1734 [58:44<01:10,  2.08s/it]100%|██████████| 1734/1734 [59:53<00:00,  2.07s/it]
+
+ Epoch: 8
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:28<56:50,  2.09s/it] 12%|█▏        | 200/1734 [06:56<53:11,  2.08s/it] 17%|█▋        | 300/1734 [10:24<49:46,  2.08s/it] 23%|██▎       | 400/1734 [13:52<46:14,  2.08s/it] 29%|██▉       | 500/1734 [17:20<42:45,  2.08s/it] 35%|███▍      | 600/1734 [20:47<39:17,  2.08s/it] 40%|████      | 700/1734 [24:16<35:51,  2.08s/it] 46%|████▌     | 800/1734 [27:44<32:22,  2.08s/it] 52%|█████▏    | 900/1734 [31:11<28:53,  2.08s/it] 58%|█████▊    | 1000/1734 [34:38<25:24,  2.08s/it] 63%|██████▎   | 1100/1734 [38:05<21:55,  2.07s/it] 69%|██████▉   | 1200/1734 [41:33<18:27,  2.07s/it] 75%|███████▍  | 1300/1734 [45:03<15:03,  2.08s/it] 81%|████████  | 1400/1734 [48:30<11:34,  2.08s/it] 87%|████████▋ | 1500/1734 [51:57<08:05,  2.08s/it] 92%|█████████▏| 1600/1734 [55:24<04:37,  2.07s/it] 98%|█████████▊| 1700/1734 [58:51<01:10,  2.07s/it]100%|██████████| 1734/1734 [1:00:00<00:00,  2.08s/it]
+
+ Evaluation -------------------------------- 
+
+  0%|          | 0/838 [00:00<?, ?it/s] 12%|█▏        | 100/838 [02:38<19:31,  1.59s/it] 24%|██▍       | 200/838 [05:16<16:49,  1.58s/it] 36%|███▌      | 300/838 [07:54<14:10,  1.58s/it] 48%|████▊     | 400/838 [10:32<11:31,  1.58s/it] 60%|█████▉    | 500/838 [13:11<08:55,  1.58s/it] 72%|███████▏  | 600/838 [15:50<06:17,  1.59s/it] 84%|████████▎ | 700/838 [18:28<03:38,  1.59s/it] 95%|█████████▌| 800/838 [21:06<01:00,  1.58s/it]100%|██████████| 838/838 [22:05<00:00,  1.58s/it]
+
+ Evaluation in Epoch 8: {'f1': 0.5393446359795973, 'roc_auc': 0.7016691133903242, 'accuracy': 0.3509288373438331}
+
+ --------------------------------------------
+
+ Epoch: 9
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:24<55:37,  2.04s/it] 12%|█▏        | 200/1734 [06:48<52:10,  2.04s/it] 17%|█▋        | 300/1734 [10:11<48:42,  2.04s/it] 23%|██▎       | 400/1734 [13:35<45:16,  2.04s/it] 29%|██▉       | 500/1734 [16:58<41:52,  2.04s/it] 35%|███▍      | 600/1734 [20:22<38:29,  2.04s/it] 40%|████      | 700/1734 [23:46<35:06,  2.04s/it] 46%|████▌     | 800/1734 [27:10<31:43,  2.04s/it] 52%|█████▏    | 900/1734 [30:33<28:18,  2.04s/it] 58%|█████▊    | 1000/1734 [33:57<24:55,  2.04s/it] 63%|██████▎   | 1100/1734 [37:20<21:31,  2.04s/it] 69%|██████▉   | 1200/1734 [40:44<18:06,  2.04s/it] 75%|███████▍  | 1300/1734 [44:07<14:42,  2.03s/it] 81%|████████  | 1400/1734 [47:30<11:19,  2.03s/it] 87%|████████▋ | 1500/1734 [50:54<07:56,  2.04s/it] 92%|█████████▏| 1600/1734 [54:18<04:32,  2.04s/it] 98%|█████████▊| 1700/1734 [57:41<01:09,  2.04s/it]100%|██████████| 1734/1734 [58:49<00:00,  2.04s/it]
+
+ Epoch: 10
+  0%|          | 0/1734 [00:00<?, ?it/s]  6%|▌         | 100/1734 [03:25<55:54,  2.05s/it] 12%|█▏        | 200/1734 [06:49<52:17,  2.05s/it] 17%|█▋        | 300/1734 [10:15<49:03,  2.05s/it] 23%|██▎       | 400/1734 [13:38<45:28,  2.05s/it] 29%|██▉       | 500/1734 [17:01<41:56,  2.04s/it] 35%|███▍      | 600/1734 [20:25<38:32,  2.04s/it] 40%|████      | 700/1734 [23:49<35:06,  2.04s/it] 46%|████▌     | 800/1734 [27:12<31:43,  2.04s/it] 52%|█████▏    | 900/1734 [30:36<28:20,  2.04s/it] 58%|█████▊    | 1000/1734 [34:01<24:57,  2.04s/it] 63%|██████▎   | 1100/1734 [37:25<21:33,  2.04s/it] 69%|██████▉   | 1200/1734 [40:49<18:09,  2.04s/it] 75%|███████▍  | 1300/1734 [44:12<14:44,  2.04s/it] 81%|████████  | 1400/1734 [47:36<11:20,  2.04s/it] 87%|████████▋ | 1500/1734 [50:59<07:56,  2.04s/it] 92%|█████████▏| 1600/1734 [54:23<04:32,  2.04s/it] 98%|█████████▊| 1700/1734 [57:47<01:09,  2.04s/it]100%|██████████| 1734/1734 [58:55<00:00,  2.04s/it]
+
+ Evaluation -------------------------------- 
+
+  0%|          | 0/838 [00:00<?, ?it/s] 12%|█▏        | 100/838 [02:40<19:42,  1.60s/it] 24%|██▍       | 200/838 [05:20<17:01,  1.60s/it] 36%|███▌      | 300/838 [07:58<14:17,  1.59s/it] 48%|████▊     | 400/838 [10:36<11:34,  1.59s/it] 60%|█████▉    | 500/838 [13:16<08:57,  1.59s/it] 72%|███████▏  | 600/838 [15:56<06:19,  1.59s/it] 84%|████████▎ | 700/838 [18:35<03:40,  1.59s/it] 95%|█████████▌| 800/838 [21:12<01:00,  1.59s/it]100%|██████████| 838/838 [22:10<00:00,  1.59s/it]
+
+ Evaluation in Epoch 10: {'f1': 0.5526654730276077, 'roc_auc': 0.7118352871004214, 'accuracy': 0.355304776211314}
+
+ --------------------------------------------
+Thu May 23 03:56:09 2024       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.54.14              Driver Version: 550.54.14      CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:01:00.0 Off |                    0 |
+| N/A   28C    P0             70W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A100-SXM4-40GB          On  |   00000000:41:00.0 Off |                    0 |
+| N/A   28C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A100-SXM4-40GB          On  |   00000000:81:00.0 Off |                    0 |
+| N/A   27C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A100-SXM4-40GB          On  |   00000000:C1:00.0 Off |                    0 |
+| N/A   26C    P0             51W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+

@@ -12,6 +12,9 @@ from transformers import ViTConfig, ViltConfig
 from torch.utils.data import DataLoader
 from transformers import ViTFeatureExtractor
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+import numpy as np
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 from pixel import (
     AutoConfig,
@@ -186,28 +189,35 @@ class VQADataset(torch.utils.data.Dataset):
 
 # Variables
 max_seq_length = 196
-epochs = 25
+epochs = 2
 lr = 5e-5
 batch_size = 4
 
-tmp_config = ViltConfig.from_pretrained("dandelin/vilt-b32-finetuned-vqa")
-config = ViTConfig.from_pretrained("facebook/vit-mae-base")
+print("Configs")
+tmp_config = ViltConfig.from_pretrained("dandelin/vilt-b32-finetuned-vqa",cache_dir="/tmp/huggingface/pixel")
+config = ViTConfig.from_pretrained("facebook/vit-mae-base",cache_dir="/tmp/huggingface/pixel")
 config.num_labels = tmp_config.num_labels
 config.label2id = tmp_config.label2id
 config.id2label = tmp_config.id2label
 
-processor_img = ViTFeatureExtractor.from_pretrained("facebook/vit-mae-base")
+processor_img = ViTFeatureExtractor.from_pretrained("facebook/vit-mae-base",cache_dir="/tmp/huggingface/pixel")
 
+print("Render")
 renderer_cls = PangoCairoTextRenderer
 processor_txt = renderer_cls.from_pretrained(
     "Team-PIXEL/pixel-base",
     rgb=False,
     max_seq_length=max_seq_length,
-    fallback_fonts_dir="fallback_fonts",
+    fallback_fonts_dir="fallback_fonts",cache_dir="/tmp/huggingface/pixel/datasets"
 )
 
 # load data
-questions, annotations, id_to_filename = load_data("val", config)
+print("Loading training data .......... \n")
+questions, annotations, id_to_filename = load_data("train", config)
+
+questions=questions[:1000]
+annotations=annotations[:1000]
+
 train_dataset = VQADataset(questions=questions,
                      annotations=annotations,
                      id_to_filename=id_to_filename,      
@@ -215,6 +225,11 @@ train_dataset = VQADataset(questions=questions,
                      processor_txt=processor_txt)
 
 questions, annotations, id_to_filename = load_data("val", config)
+
+print("Loading validation data ........ \n")
+questions=questions[:1000]
+annotations=annotations[:1000]
+
 valid_dataset = VQADataset(questions=questions,
                      annotations=annotations,
                      id_to_filename=id_to_filename,
@@ -225,10 +240,11 @@ config.img_size = 224
 config.txt_size = [16, 8464]
 device = torch.device("cuda" if torch.cuda.is_available() else "CPU")
 
+print("Loading Model ........ \n")
 model = VIPForQuestionAnswering.from_pretrained("Checkpoints/vip", 
                                                        config=config,
                                                        pooling_mode=PoolingMode.from_string("mean"),
-                                                       add_layer_norm=True)
+                                                       add_layer_norm=True,cache_dir="/tmp/huggingface/pixel")
 model.to(device)
 
 resize_model_embeddings(model, max_seq_length)
@@ -238,43 +254,53 @@ valid_dataloader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=True
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
 
-for epoch in range(epochs):  # loop over the dataset multiple times
-  model.train()
-  print(f"Epoch: {epoch}")
-  for batch in tqdm(train_dataloader):
-      # get the inputs;
-      batch = {k:v.to(device) for k,v in batch.items()}
+print("Training ......... \n")
+for epoch in range(epochs): #loop over the dataset multiple times
+    model.train()
+    print(f"Epoch: {epoch}")
+    for batch in tqdm(train_dataloader):
+        #get the inputs;
+        batch={k:v.to(device) for k,v in batch.items()}
 
-      # zero the parameter gradients
-      optimizer.zero_grad()
+        # zero the parameter gradients
+        optimizer.zero_grad()
 
-      # forward + backward + optimize
-      outputs = model(**batch)
-      loss = outputs.loss
-      # print("Loss:", loss.item())
-      loss.backward()
-      optimizer.step()
+        # forward + backward + optimize
+        outputs = model(**batch)
+        loss = outputs.loss
 
-  model.eval()
-  for step, batch in enumerate(tqdm(valid_dataloader)):
-      # get the inputs;
-      batch = {k:v.to(device) for k,v in batch.items()}
-      with torch.no_grad():
-          outputs = model(**batch)
-      predictions = outputs.logits#.argmax(dim=-1)
-      sigmoid = torch.nn.Sigmoid()
-      probs = sigmoid(torch.Tensor(predictions)).cpu().numpy()
-      # next, use threshold to turn them into integer predictions
-      y_pred = np.zeros(probs.shape)
-      y_pred[np.where(probs >= 0.5)] = 1
-      # finally, compute metrics
-      y_true = (batch['labels'] > 0).cpu().numpy()
-      f1_micro_average = f1_score(y_true=y_true, y_pred=y_pred, average='micro')
-      roc_auc = roc_auc_score(y_true, y_pred, average = 'micro')
-      accuracy = accuracy_score(y_true, y_pred)
-      # return as dictionary
-      metrics = {'f1': f1_micro_average,
+        # print("Loss:", loss.item())
+        loss.backward()
+        optimizer.step()
+
+    model.eval()
+
+    print("Validation step")
+
+    for step,batch in enumerate(tqdm(valid_dataloader)):
+        # get the inputs;
+        batch = {k:v.to(device) for k,v in batch.items()}
+
+        with torch.no_grad():
+            outputs = model(**batch)
+        
+        predictions = outputs.logits#.argmax(dim=-1)
+        sigmoid = torch.nn.Sigmoid()
+        probs = sigmoid(torch.Tensor(predictions)).cpu().numpy()
+
+        # next, use threshold to turn them into integer predictions
+        y_pred = np.zeros(probs.shape)
+        y_pred[np.where(probs >= 0.5)] = 1
+
+        # finally, compute metrics
+
+        y_true = (batch['labels'] > 0).cpu().numpy()
+        f1_micro_average = f1_score(y_true=y_true, y_pred=y_pred, average='micro')
+        roc_auc = roc_auc_score(y_true, y_pred, average = 'micro')
+        accuracy = accuracy_score(y_true, y_pred)
+        # return as dictionary
+        metrics = {'f1': f1_micro_average,
                 'roc_auc': roc_auc,
                 'accuracy': accuracy}
-
-  print(f"epoch {epoch}:", metrics)
+        
+    print(f"epoch {epoch}:", metrics)

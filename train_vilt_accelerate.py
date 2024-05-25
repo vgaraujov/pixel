@@ -2,7 +2,8 @@ import json
 import re
 import math
 from typing import Optional
-
+#import logging
+#logging.basicConfig(level=logging.DEBUG)
 import torch
 import numpy as np
 from PIL import Image
@@ -13,9 +14,8 @@ from transformers import ViTConfig, ViltConfig, ViltProcessor, ViltForQuestionAn
 from torch.utils.data import DataLoader
 from transformers import ViTFeatureExtractor
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+from accelerate import Accelerator
 
-#import logging
-#logging.basicConfig(level=logging.DEBUG)
 
 filename_re = re.compile(r".*(\d{12})\.((jpg)|(png))")
 
@@ -37,11 +37,11 @@ def load_data(split, config):
 
     questions = data_questions['questions']
 
-    print(f"Number of {split} questions:", len(questions))
+    print(f"\n Number of {split} questions:", len(questions)) if accelerator.is_main_process else None
 
     # root at which all images are stored
     root = f'/home/david.mogrovejo/PVLM/VQAv2/{split}2014'
-    file_names = [f for f in tqdm(listdir(root)) if isfile(join(root, f))]
+    file_names = [f for f in listdir(root) if isfile(join(root, f))]
 
     filename_to_id = {root + "/" + file: id_from_filename(file) for file in file_names}
     id_to_filename = {v:k for k,v in filename_to_id.items()}
@@ -54,9 +54,9 @@ def load_data(split, config):
 
     annotations = data_annotations['annotations']
 
-    print(f"Number of {split} annotations:", len(annotations))
+    print(f"\n Number of {split} annotations:", len(annotations)) if accelerator.is_main_process else None
 
-    for annotation in tqdm(annotations):
+    for annotation in annotations:
         answers = annotation['answers']
         answer_count = {}
         for answer in answers:
@@ -136,57 +136,64 @@ def collate_fn(batch):
 
 # Variables
 max_seq_length = 196
-epochs = 1
+epochs = 10
 lr = 5e-5
-batch_size = 2
+batch_size = 64
 
-print("Defining Configs and Processor ......\n")
+
+accelerator = Accelerator()
+device = accelerator.device
+
+print("Defining Configs and Processor ......\n") if accelerator.is_main_process else None
+
 config = ViltConfig.from_pretrained("dandelin/vilt-b32-finetuned-vqa",cache_dir="/tmp/huggingface/pixel")
 processor = ViltProcessor.from_pretrained("dandelin/vilt-b32-mlm",cache_dir="/tmp/huggingface/pixel")
 
-print("Loading training data ......")
+
+print("\n Loading training data ...... \n") if accelerator.is_main_process else None
 # load data
 questions, annotations, id_to_filename = load_data("train", config)
-
-questions=questions[:10]
-annotations=annotations[:10]
-
 train_dataset = VQADataset(questions=questions,
                      annotations=annotations,
                      id_to_filename=id_to_filename,
                      processor=processor)
 
-print("Loading evaluation data..... \n")
+
+print("\n Loading evaluation data..... \n") if accelerator.is_main_process else None
+
 questions, annotations, id_to_filename = load_data("val", config)
-
-questions=questions[:10]
-annotations=annotations[:10]
-
 valid_dataset = VQADataset(questions=questions,
                      annotations=annotations,
                      id_to_filename=id_to_filename,
                      processor=processor)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-print("Loading Model....... \n")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("\n Loading Model....... \n") if accelerator.is_main_process else None
+
 model = ViltForQuestionAnswering.from_pretrained("dandelin/vilt-b32-mlm",
                                                  id2label=config.id2label,
                                                  label2id=config.label2id,cache_dir="/tmp/huggingface/pixel")
 model.to(device)
 
-print("Loading Dataloaders ..... \n")
+
+print("Loading Dataloaders ..... \n") if accelerator.is_main_process else None
 train_dataloader = DataLoader(train_dataset, collate_fn=collate_fn, batch_size=batch_size, shuffle=True)
 valid_dataloader = DataLoader(valid_dataset, collate_fn=collate_fn, batch_size=batch_size, shuffle=False)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
 
+model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train_dataloader)
+valid_dataloader = accelerator.prepare(valid_dataloader)
 
-print("Training Started ...... \n")
+
+
+print("\n Training Started ...... \n") if accelerator.is_main_process else None
 for epoch in range(epochs):
     model.train()
-    print(f"Epoch: {epoch}")
-    for batch in tqdm(train_dataloader):
+    print(f"\n Epoch: {epoch+1}") if accelerator.is_main_process else None
+    for step,batch in enumerate(tqdm(train_dataloader, disable=not accelerator.is_main_process,miniters=100,maxinterval=float("inf"))):
+
         # get the inputs;
         batch = {k:v.to(device) for k,v in batch.items()}
         # zero the parameter gradients
@@ -196,34 +203,54 @@ for epoch in range(epochs):
         outputs = model(**batch)
         loss = outputs.loss
         # print("Loss:", loss.item())
-        loss.backward()
+        #loss.backward()
+        accelerator.backward(loss)
         optimizer.step()
 
     model.eval()
 
-    if epoch%2==0:
-        for step, batch in enumerate(tqdm(valid_dataloader)):
+    if (epoch+1)%2==0 or epochs==epoch+1:
+        print("\n Evaluation -------------------------------- \n") if accelerator.is_main_process else None
+        predictions,labels=[],[]
+        for step, batch in enumerate(tqdm(valid_dataloader,disable=not accelerator.is_main_process,miniters=100,maxinterval=float("inf"))):
+
             # get the inputs;
             batch = {k:v.to(device) for k,v in batch.items()}
             with torch.no_grad():
                 outputs = model(**batch)
-            predictions = outputs.logits#.argmax(dim=-1)
+            pred = outputs.logits#.argmax(dim=-1)
             sigmoid = torch.nn.Sigmoid()
-            probs = sigmoid(torch.Tensor(predictions)).cpu().numpy()
-            # next, use threshold to turn them into integer predictions
-            y_pred = np.zeros(probs.shape)
-            y_pred[np.where(probs >= 0.5)] = 1
-            y_pred=torch.tensor(y_pred)
-            # finally, compute metrics
-            y_true = (batch['labels'] > 0).cpu()
-            y_true=torch.tensor(y_true)
+            probs = sigmoid(torch.Tensor(pred))
+            #probs = sigmoid(torch.Tensor(pred)).cpu().numpy()
 
-            f1_micro_average = f1_score(y_true=y_true, y_pred=y_pred, average='micro')
-            roc_auc = roc_auc_score(y_true, y_pred, average = 'micro')
-            accuracy = accuracy_score(y_true, y_pred)
+            # next, use threshold to turn them into integer predictions
+            y_pred = torch.zeros(probs.shape)
+            y_pred = torch.where(probs>=0.5,1.0,0.0).to(device)
+            #y_pred = np.zeros(probs.shape)
+            #y_pred[np.where(probs >= 0.5)] = 1
+
+            # finally, compute metrics
+            y_true = torch.where(batch['labels']>0,True,False).to(device)
+            #y_true = (batch['labels'] > 0).cpu()
+
+            predictions.append(accelerator.gather(y_pred))
+            labels.append(accelerator.gather(y_true))
+
+        if accelerator.is_main_process:
+
+            predictions=torch.cat(predictions,0)
+            labels=torch.cat(labels,0)
+
+            predictions = predictions[:len(valid_dataloader.dataset)].cpu()
+            labels = labels[:len(valid_dataloader.dataset)].cpu()
+
+            f1_micro_average = f1_score(y_true=labels, y_pred=predictions, average='micro')
+            roc_auc = roc_auc_score(labels, predictions, average = 'micro')
+            accuracy = accuracy_score(labels, predictions)
             # return as dictionary
             metrics = {'f1': f1_micro_average,
                 'roc_auc': roc_auc,
                 'accuracy': accuracy}
-            
-        print(f"Evaluation in Epoch {epoch}:", metrics)
+                
+            print(f"\n Evaluation in Epoch {epoch+1}:", metrics)
+            print("\n --------------------------------------------")
